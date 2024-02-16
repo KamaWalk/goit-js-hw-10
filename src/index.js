@@ -23,6 +23,11 @@
 //   };
 
 import { fetchBreeds, fetchCatByBreed } from './cat-api';
+import SlimSelect from 'slim-select'
+
+new SlimSelect({
+  select: '#select'
+})
 
 const breedSelect = document.querySelector('.breed-select');
 const catInfo = document.querySelector('.cat-info');
