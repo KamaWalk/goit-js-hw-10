@@ -13,7 +13,7 @@ body {
     height: 32px;
     position: relative;
     border-radius: 50%;
-    color: #ed19ad;
+    color: #f21cb2;
     animation: fill 1s ease-in infinite alternate;
   }
   .loader::before , .loader::after {
