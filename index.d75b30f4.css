@@ -1,2 +1,0 @@
-.hidden{display:none}.loader{width:32px;height:32px;color:#ff3d00;border-radius:50%;animation:fill 1s ease-in infinite alternate;position:relative}.loader:before,.loader:after{content:"";height:100%;width:100%;border-radius:50%;animation:fill .9s ease-in infinite alternate;position:absolute;top:0;left:48px}.loader:after{animation-duration:1.1s;left:auto;right:48px}@keyframes fill{0%{box-shadow:inset 0 0 0 2px}to{box-shadow:inset 0 0 0 10px}}
-/*# sourceMappingURL=index.d75b30f4.css.map */
