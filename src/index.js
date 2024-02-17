@@ -1,73 +1,71 @@
-// import axios from "axios";
 
-// axios.defaults.headers.common["x-api-key"] = "live_XAq27iNex6cclMdmKz5SxY5xMqDkBV0phNZLRfz4efEBAxdGHL5XqFvXQF1ML7CE";
-
-// const fetchBreedSelect = document.querySelector(".breed-select");
-
-// fetchBreedSelect.addEventListener("select", () => {
-//     fetchBreeds()
-//     .then((breed) => renderBreeds(breed))
-//     .catch((error) => console.log(error))
-// });
-
-// function fetchBreeds() {
-//     return fetch("https://api.thecatapi.com/v1/breeds")
-//     .then(
-//       (response) => {
-//         if (!response.ok) {
-//           throw new Error(response.status);
-//         }
-//         return response.json();
-//       }
-//     );
-//   };
-
-
-
-import { fetchBreeds, fetchCatByBreed } from './cat-api';
-// import SlimSelect from 'slim-select';
-
-// new SlimSelect({
-//   select: '#select'
-// });
+import { fetchBreeds, fetchCatByBreed } from './cat-api.js';
+import SlimSelect from 'slim-select';
+import 'slim-select/dist/slimselect.css';
 
 const breedSelect = document.querySelector('.breed-select');
-const catInfo = document.querySelector('.cat-info');
+const catInfoDiv = document.querySelector('.cat-info');
 const loader = document.querySelector('.loader');
+const errorParagraph = document.querySelector('.error');
+let slimSelect;
 
-try {
-  loader.classList.remove('hidden');
-  fetchBreeds().then(data => renderSelect(data));
-} catch (error) {
-  console.log(error);
-}
+const showLoader = show => {
+  loader.style.display = show ? 'block' : 'none';
+};
 
-function renderSelect(breeds) {
-  const markup = breeds
-    .map(({ id, name }) => {
-      return `<option value="${id}">${name}</option>`;
-    })
-    .join('');
-  breedSelect.insertAdjacentHTML('beforeend', markup);
-  loader.classList.add('hidden');
-}
+const showError = show => {
+  errorParagraph.style.display = show ? 'block' : 'none';
+};
 
-breedSelect.addEventListener('change', e => {
-  loader.classList.remove('hidden');
-  fetchCatByBreed(e.target.value).then(data => renderCat(data[0]));
+const updateCatInfo = (catData) => {
+  catInfoDiv.innerHTML = 
+  `<div class="cat_div">
+    <img class="cat_img" src="${catData.url}" alt="Cat image">
+    <div class="cat_information">
+    <p class="cat_name"><span>Name:</span> ${catData.breeds[0].name}</p>
+    <p class="cat_description"><span>Description:</span> ${catData.breeds[0].description}</p>
+    <p class="cat_temperament"><span>Temperament:</span> ${catData.breeds[0].temperament}</p>
+    </div>
+    </div>
+  `;
+};
+
+const displayCatInfo = async breedId => {
+  showLoader(true);
+  showError(false);
+  try {
+    const catData = await fetchCatByBreed(breedId);
+    updateCatInfo(catData);
+  } catch (error) {
+    console.error(error);
+    showError(true);
+  } finally {
+    showLoader(false);
+  }
+};
+
+const updateBreedOptions = async () => {
+  showLoader(true);
+  showError(false);
+  try {
+    const breeds = await fetchBreeds();
+    slimSelect.setData(breeds.map(breed => ({ text: breed.name, value: breed.id })));
+  } catch (error) {
+    console.error(error);
+    showError(true);
+  } finally {
+    showLoader(false);
+  }
+};
+
+breedSelect.addEventListener('change', () => {
+  const selectedBreedId = breedSelect.value;
+  displayCatInfo(selectedBreedId);
 });
 
-function renderCat(catData) {
-  const { url } = catData;
-  const { description, name, temperament } = catData.breeds[0];
-  catInfo.insertAdjacentHTML(
-    'beforeend',
-    `<div>
-        <h2>${name}</h2>
-        <img src="${url}" alt="${name}" />
-        <p>${description}</p>
-        <p><strong>Temperament:</strong> ${temperament}</p>
-    </div>`
-  );
-  loader.classList.add('hidden');
-}
+window.onload = () => {
+  slimSelect = new SlimSelect({
+    select: breedSelect
+  });
+  updateBreedOptions();
+};
